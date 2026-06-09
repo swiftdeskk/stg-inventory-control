@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<nav id="sidebar" class="shadow-lg" th:fragment="sidebar(activePage)">
+
+  <div class="sidebar-header d-flex justify-content-between align-items-center">
+    <a th:href="@{/}" class="sidebar-brand text-decoration-none">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-boxes-stacked"></i>
+      </div>
+      <span class="sidebar-brand-name">TechStore</span>
+    </a>
+    <button type="button" id="sidebarCollapseClose"
+            class="btn btn-sm d-md-none border-0"
+            style="color:rgba(255,255,255,0.5);background:transparent;">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <ul class="nav flex-column py-2">
+
+    <!-- Escritorio -->
+    <li class="nav-item">
+      <a th:href="@{/}" class="nav-link"
+         th:classappend="${activePage == 'index'} ? ' active' : ''">
+        <i class="fa-solid fa-chart-pie fa-fw me-2"></i> Escritorio
+      </a>
+    </li>
+
+    <!-- Almacen -->
+    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','ALMACENERO')">
+      <a href="#almacenSubmenu" data-bs-toggle="collapse"
+         th:aria-expanded="${activePage == 'categorias' or activePage == 'marcas' or activePage == 'productos'} ? 'true' : 'false'"
+         class="nav-link d-flex align-items-center">
+        <i class="fa-solid fa-box fa-fw me-2"></i>
+        <span>Almacen</span>
+        <i class="fa-solid fa-chevron-down sidebar-chevron"></i>
+      </a>
+      <div class="collapse"
+           th:classappend="${activePage == 'categorias' or activePage == 'marcas' or activePage == 'productos'} ? ' show' : ''"
+           id="almacenSubmenu">
+        <ul class="nav flex-column sidebar-submenu">
+          <li class="nav-item">
+            <a th:href="@{/categorias}" class="nav-link"
+               th:classappend="${activePage == 'categorias'} ? ' active' : ''">Categorias</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/marcas}" class="nav-link"
+               th:classappend="${activePage == 'marcas'} ? ' active' : ''">Marcas</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/productos}" class="nav-link"
+               th:classappend="${activePage == 'productos'} ? ' active' : ''">Productos</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <!-- Productos -->
+    <li class="nav-item" sec:authorize="hasRole('VENDEDOR')">
+      <a th:href="@{/productos}" class="nav-link"
+         th:classappend="${activePage == 'productos'} ? ' active' : ''">
+        <i class="fa-solid fa-box fa-fw me-2"></i> Productos
+      </a>
+    </li>
+
+    <!-- Operaciones -->
+    <li class="nav-item">
+      <a href="#operacionesSubmenu" data-bs-toggle="collapse"
+         th:aria-expanded="${activePage == 'entradas' or activePage == 'salidas' or activePage == 'movimientos'} ? 'true' : 'false'"
+         class="nav-link d-flex align-items-center">
+        <i class="fa-solid fa-right-left fa-fw me-2"></i>
+        <span>Operaciones</span>
+        <i class="fa-solid fa-chevron-down sidebar-chevron"></i>
+      </a>
+      <div class="collapse"
+           th:classappend="${activePage == 'entradas' or activePage == 'salidas' or activePage == 'movimientos'} ? ' show' : ''"
+           id="operacionesSubmenu">
+        <ul class="nav flex-column sidebar-submenu">
+          <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','ALMACENERO')">
+            <a th:href="@{/entradas}" class="nav-link"
+               th:classappend="${activePage == 'entradas'} ? ' active' : ''">Entradas</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/salidas}" class="nav-link"
+               th:classappend="${activePage == 'salidas'} ? ' active' : ''">Salidas</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/movimientos}" class="nav-link"
+               th:classappend="${activePage == 'movimientos'} ? ' active' : ''">Kardex</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <!-- Administracion -->
+    <li class="nav-item mt-2" sec:authorize="hasRole('ADMIN')">
+      <p class="sidebar-section-label">Administracion</p>
+      <a href="#accesosSubmenu" data-bs-toggle="collapse"
+         th:aria-expanded="${activePage == 'usuarios' or activePage == 'roles'} ? 'true' : 'false'"
+         class="nav-link d-flex align-items-center">
+        <i class="fa-solid fa-shield-halved fa-fw me-2"></i>
+        <span>Seguridad</span>
+        <i class="fa-solid fa-chevron-down sidebar-chevron"></i>
+      </a>
+      <div class="collapse"
+           th:classappend="${activePage == 'usuarios' or activePage == 'roles'} ? ' show' : ''"
+           id="accesosSubmenu">
+        <ul class="nav flex-column sidebar-submenu">
+          <li class="nav-item">
+            <a th:href="@{/usuarios}" class="nav-link"
+               th:classappend="${activePage == 'usuarios'} ? ' active' : ''">Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/roles}" class="nav-link"
+               th:classappend="${activePage == 'roles'} ? ' active' : ''">Roles y Permisos</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+  </ul>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechStore — Error del Servidor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+</head>
+<body>
+<div id="wrapper">
+  <div th:replace="~{fragments/sidebar :: sidebar('')}"></div>
+  <div id="content">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    <div class="container-fluid px-4 py-5 text-center">
+      <div style="max-width:420px;margin:60px auto;">
+        <div style="font-size:4rem;margin-bottom:16px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;opacity:0.7;"></i>
+        </div>
+        <h2 class="fw-bold mb-2" style="color:var(--text-primary);">Ocurrio un Error</h2>
+        <p style="color:var(--text-muted-color);margin-bottom:8px;" th:if="${mensaje}" th:text="${mensaje}">—</p>
+        <p style="color:var(--text-muted-color);margin-bottom:28px;" th:unless="${mensaje}">
+          Se produjo un error inesperado. Intenta de nuevo o contacta al administrador.
+        </p>
+        <a th:href="@{/}" class="btn btn-primary btn-rounded px-4">
+          <i class="fa-solid fa-house me-2"></i>Volver al inicio
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script th:src="@{/js/btn_sidebar.js}"></script>
+</body>
+</html>

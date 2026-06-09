@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechStore — Usuarios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+</head>
+<body>
+<div id="wrapper">
+
+  <div th:replace="~{fragments/sidebar :: sidebar('usuarios')}"></div>
+
+  <div id="content">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container-fluid px-4 py-4">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="page-header-title">Usuarios del Sistema</h1>
+          <p class="page-header-subtitle">Gestión de cuentas y accesos del personal (RF-03)</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-rounded px-4 shadow-sm"
+                data-bs-toggle="modal" data-bs-target="#modalNuevoUsuario">
+          <i class="fa-solid fa-user-plus me-2"></i>Nuevo Usuario
+        </button>
+      </div>
+
+      <!-- Alertas -->
+      <div th:if="${param.exito}" class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="fa-solid fa-circle-check me-2"></i> Usuario registrado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div th:if="${param.exitoActualizar}" class="alert alert-info alert-dismissible fade show mb-3">
+        <i class="fa-solid fa-pen-to-square me-2"></i> Usuario actualizado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div th:if="${param.exitoBloqueo}" class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="fa-solid fa-shield-halved me-2"></i> Estado de cuenta actualizado.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <!-- Tabla -->
+      <div class="card border-0">
+        <div class="card-body p-0 table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th class="ps-4">Usuario</th>
+                <th>Correo</th>
+                <th class="text-center">Rol</th>
+                <th class="text-center">Ultimo Acceso</th>
+                <th class="text-center">Estado</th>
+                <th class="pe-4 text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="user : ${listaUsuarios}">
+                <td class="ps-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.nombreCompleto != null ? user.nombreCompleto : user.username} + '&background=0d6efd&color=fff&size=64'}"
+                         class="rounded-circle" width="36" height="36" th:alt="${user.username}"/>
+                    <div>
+                      <div class="fw-semibold" style="font-size:0.9rem;"
+                           th:text="${user.nombreCompleto != null ? user.nombreCompleto : 'Sin Nombre'}">—</div>
+                      <div style="font-size:0.78rem;color:var(--text-muted-color);" th:text="${user.username}">—</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="color:var(--text-muted-color);font-size:0.85rem;"
+                    th:text="${user.correo != null ? user.correo : '—'}">—</td>
+                <td class="text-center">
+                  <span class="badge rounded-pill"
+                        th:classappend="${user.rol == 'ROLE_ADMIN'} ? ' bg-primary bg-opacity-10' : (${user.rol == 'ROLE_ALMACENERO'} ? ' bg-info bg-opacity-10' : ' bg-secondary bg-opacity-10')"
+                        th:text="${user.rol.replace('ROLE_','')}">Rol</span>
+                </td>
+                <td class="text-center" style="font-size:0.82rem;color:var(--text-muted-color);">
+                  <span th:if="${user.ultimoAcceso != null}"
+                        th:text="${#temporals.format(user.ultimoAcceso,'dd/MM/yyyy hh:mm a')}">—</span>
+                  <span th:unless="${user.ultimoAcceso != null}">—</span>
+                </td>
+                <td class="text-center">
+                  <span th:unless="${user.cuentaBloqueada}" class="badge bg-success bg-opacity-10 rounded-pill">Activo</span>
+                  <span th:if="${user.cuentaBloqueada}" class="badge bg-danger bg-opacity-10 rounded-pill">
+                    <i class="fa-solid fa-lock me-1"></i>Bloqueado
+                  </span>
+                </td>
+                <td class="pe-4 text-end">
+                  <!-- Editar -->
+                  <button type="button" class="btn btn-sm btn-light text-warning"
+                          title="Editar usuario"
+                          data-bs-toggle="modal" data-bs-target="#modalEditarUsuario"
+                          th:data-id="${user.id}"
+                          th:data-nombre="${user.nombreCompleto}"
+                          th:data-correo="${user.correo}"
+                          th:data-rol="${user.rol}"
+                          onclick="cargarDatosEditar(this)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <!-- Bloquear / Desbloquear -->
+                  <form th:action="@{/usuarios/toggleBloqueo}" method="post" class="d-inline m-0 p-0">
+                    <input type="hidden" name="id" th:value="${user.id}"/>
+                    <button type="submit" class="btn btn-sm btn-light ms-1"
+                            th:classappend="${user.cuentaBloqueada} ? ' text-success' : ' text-danger'"
+                            th:title="${user.cuentaBloqueada} ? 'Desbloquear cuenta' : 'Bloquear cuenta'">
+                      <i class="fa-solid" th:classappend="${user.cuentaBloqueada} ? ' fa-lock-open' : ' fa-lock'"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- RF-03 -->
+<div class="modal fade" id="modalNuevoUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="fw-bold"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Registrar Nuevo Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form th:action="@{/usuarios/guardar}" method="post" class="row g-3">
+
+          <div class="col-12" th:if="${errorModal == 'username'}">
+            <div class="alert alert-danger small py-2 mb-0">
+              <i class="fa-solid fa-triangle-exclamation me-2"></i>El nombre de usuario ya existe en el sistema.
+            </div>
+          </div>
+          <div class="col-12" th:if="${errorModal == 'correo'}">
+            <div class="alert alert-danger small py-2 mb-0">
+              <i class="fa-solid fa-triangle-exclamation me-2"></i>El correo electrónico ya está registrado.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" name="nombreCompleto" class="form-control"
+                   th:value="${usuarioMantenido?.nombreCompleto}" placeholder="Ej: Carlos Villanueva" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" name="correo" class="form-control"
+                   th:value="${usuarioMantenido?.correo}" placeholder="correo@techstore.com" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nombre de Usuario</label>
+            <input type="text" name="username" class="form-control"
+                   th:value="${usuarioMantenido?.username}" placeholder="Ej: cvillanueva" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Rol del Sistema</label>
+            <select name="rol" class="form-select" required>
+              <option selected disabled value="">Asignar rol...</option>
+              <option th:each="rol : ${listaRoles}"
+                      th:value="${rol.nivelAcceso}"
+                      th:text="${rol.nombre}">Rol</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Contraseña Temporal</label>
+            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6"/>
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <button type="button" class="btn btn-light btn-rounded px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary btn-rounded px-4">Guardar Usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Usuario -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:var(--badge-warning-bg);">
+        <h5 class="fw-bold"><i class="fa-solid fa-pen-to-square text-warning me-2"></i>Editar Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form th:action="@{/usuarios/actualizar}" method="post" class="row g-3">
+          <input type="hidden" name="id" id="edit_user_id"/>
+          <div class="col-md-6">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" name="nombreCompleto" id="edit_user_nombre" class="form-control" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" name="correo" id="edit_user_correo" class="form-control" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Rol del Sistema</label>
+            <select name="rol" id="edit_user_rol" class="form-select" required>
+              <option th:each="rol : ${listaRoles}"
+                      th:value="${rol.nivelAcceso}"
+                      th:text="${rol.nombre}">Rol</option>
+            </select>
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <button type="button" class="btn btn-light btn-rounded px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-warning btn-rounded px-4 fw-bold text-dark">Actualizar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script th:src="@{/js/btn_sidebar.js}"></script>
+<script th:if="${errorModal != null}">
+  document.addEventListener("DOMContentLoaded", () =>
+    new bootstrap.Modal(document.getElementById("modalNuevoUsuario")).show());
+</script>
+<script>
+  function cargarDatosEditar(btn) {
+    document.getElementById("edit_user_id").value = btn.dataset.id;
+    document.getElementById("edit_user_nombre").value = btn.dataset.nombre || "";
+    document.getElementById("edit_user_correo").value = btn.dataset.correo || "";
+    // btn.dataset.rol is already "ROLE_ADMIN" etc., matching the option values
+    document.getElementById("edit_user_rol").value = btn.dataset.rol || "";
+  }
+</script>
+</body>
+</html>

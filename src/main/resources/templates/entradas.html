@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechStore — Entradas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+</head>
+<body>
+<div id="wrapper">
+
+  <div th:replace="~{fragments/sidebar :: sidebar('entradas')}"></div>
+
+  <div id="content">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container-fluid px-4 py-4">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="page-header-title">Ingreso de Mercaderia</h1>
+          <p class="page-header-subtitle">Registro de compras a proveedores — actualiza el stock automaticamente</p>
+        </div>
+        <button type="button" class="btn btn-rounded px-4 shadow-sm"
+                style="background:var(--badge-success-bg);color:#198754;border:1px solid rgba(25,135,84,0.3);"
+                data-bs-toggle="modal" data-bs-target="#modalNuevaEntrada">
+          <i class="fa-solid fa-truck-ramp-box me-2"></i>Registrar Entrada
+        </button>
+      </div>
+
+      <!-- Alertas -->
+      <div th:if="${param.exito}" class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="fa-solid fa-circle-check me-2"></i> Entrada registrada. El stock fue actualizado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div th:if="${param.errorCantidad}" class="alert alert-danger alert-dismissible fade show mb-3">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i> La cantidad debe ser mayor a cero.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <!-- Tabla de entradas -->
+      <div class="card border-0">
+        <div class="card-body p-0 table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th class="ps-4">Doc. Ref.</th>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-center">Stock Ant.</th>
+                <th class="text-center">Stock Nuevo</th>
+                <th class="pe-4">Registrado por</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="mov : ${listaMovimientos}">
+                <td class="ps-4">
+                  <span class="fw-bold" style="color:var(--text-muted-color);font-size:0.82rem;"
+                        th:text="${mov.documentoRef != null and !mov.documentoRef.isEmpty()} ? ${mov.documentoRef} : '—'">—</span>
+                </td>
+                <td style="color:var(--text-muted-color);font-size:0.82rem;"
+                    th:text="${#temporals.format(mov.fecha,'dd/MM/yyyy HH:mm')}">—</td>
+                <td>
+                  <div class="fw-medium" th:text="${mov.producto.nombre}">—</div>
+                  <div style="font-size:0.78rem;color:var(--text-muted-color);" th:text="${mov.producto.sku}">—</div>
+                </td>
+                <td class="text-center fw-bold" style="color:#198754;" th:text="${'+' + mov.cantidad}">+0</td>
+                <td class="text-center" style="color:var(--text-muted-color);" th:text="${mov.stockAnterior}">0</td>
+                <td class="text-center fw-semibold" th:text="${mov.stockResultante}">0</td>
+                <td class="pe-4" style="font-size:0.83rem;color:var(--text-muted-color);" th:text="${mov.usuarioNombre}">—</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(listaMovimientos)}">
+                <td colspan="7" class="text-center py-5" style="color:var(--text-muted-color);">
+                  <i class="fa-solid fa-truck-ramp-box fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                  No hay entradas registradas aun.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registrar Entrada -->
+<div class="modal fade" id="modalNuevaEntrada" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="fw-bold" style="color:#198754;">
+          <i class="fa-solid fa-truck-ramp-box me-2"></i>Registrar Entrada de Stock
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form th:action="@{/entradas/guardar}" method="post" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Producto</label>
+            <select name="productoId" class="form-select" required>
+              <option selected disabled value="">Seleccionar producto...</option>
+              <option th:each="p : ${listaProductos}"
+                      th:value="${p.id}"
+                      th:text="${p.sku + ' — ' + p.nombre + ' (Stock: ' + p.stock + ')'}"></option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cantidad a Ingresar</label>
+            <input type="number" name="cantidad" class="form-control" placeholder="Ej: 50" min="1" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Documento Ref. (Opcional)</label>
+            <input type="text" name="documentoRef" class="form-control" placeholder="Ej: FAC-001-1234"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Observacion (Opcional)</label>
+            <input type="text" name="observacion" class="form-control" placeholder="Nota adicional..."/>
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <button type="button" class="btn btn-light btn-rounded px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-rounded px-4 fw-semibold"
+                    style="background:#198754;color:#fff;border:none;">
+              <i class="fa-solid fa-circle-plus me-2"></i>Guardar Entrada
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script th:src="@{/js/btn_sidebar.js}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (new URLSearchParams(window.location.search).has("exito") ||
+        new URLSearchParams(window.location.search).has("errorCantidad")) return;
+  });
+</script>
+</body>
+</html>

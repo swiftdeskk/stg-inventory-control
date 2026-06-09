@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechStore — Kardex</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+</head>
+<body>
+<div id="wrapper">
+
+  <div th:replace="~{fragments/sidebar :: sidebar('movimientos')}"></div>
+
+  <div id="content">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container-fluid px-4 py-4">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="page-header-title">Kardex de Inventario</h1>
+          <p class="page-header-subtitle">Historial completo de movimientos de stock</p>
+        </div>
+        <a th:href="@{/export/movimientos.xlsx}" class="btn btn-success btn-rounded px-4 shadow-sm">
+          <i class="fa-solid fa-file-excel me-2"></i>Exportar Excel
+        </a>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filter-card">
+        <form th:action="@{/movimientos}" method="get" class="row g-2 align-items-end">
+          <div class="col-12 col-md-3">
+            <label class="form-label">Tipo de Movimiento</label>
+            <select name="tipo" class="form-select">
+              <option value="" th:selected="${paramTipo == ''}">Todos los movimientos</option>
+              <option value="ENTRADA" th:selected="${paramTipo == 'ENTRADA'}">Solo Entradas</option>
+              <option value="SALIDA" th:selected="${paramTipo == 'SALIDA'}">Solo Salidas</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Desde</label>
+            <input type="date" name="fechaDesde" class="form-control" th:value="${paramFechaDesde}"/>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Hasta</label>
+            <input type="date" name="fechaHasta" class="form-control" th:value="${paramFechaHasta}"/>
+          </div>
+          <div class="col-12 col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fa-solid fa-filter me-1"></i> Filtrar
+            </button>
+            <a th:href="@{/movimientos}" class="btn btn-light" title="Ver todos">
+              <i class="fa-solid fa-eraser"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <div class="card border-0">
+        <div class="card-body p-0 table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th class="ps-4">Fecha</th>
+                <th>Producto</th>
+                <th class="text-center">Tipo</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-center">Stock Ant.</th>
+                <th class="text-center">Stock Final</th>
+                <th>Doc. Ref.</th>
+                <th class="pe-4">Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="mov : ${listaMovimientos}">
+                <td class="ps-4" style="font-size:0.82rem;color:var(--text-muted-color);"
+                    th:text="${#temporals.format(mov.fecha,'dd/MM/yyyy HH:mm')}">—</td>
+                <td>
+                  <div class="fw-medium" style="font-size:0.87rem;" th:text="${mov.producto.nombre}">—</div>
+                  <div style="font-size:0.75rem;color:var(--text-muted-color);" th:text="${mov.producto.sku}">—</div>
+                </td>
+                <td class="text-center">
+                  <span th:if="${mov.tipo == 'ENTRADA'}" class="badge bg-success bg-opacity-10 rounded-pill">
+                    <i class="fa-solid fa-arrow-up me-1"></i>Entrada
+                  </span>
+                  <span th:if="${mov.tipo == 'SALIDA'}" class="badge bg-danger bg-opacity-10 rounded-pill">
+                    <i class="fa-solid fa-arrow-down me-1"></i>Salida
+                  </span>
+                </td>
+                <td class="text-center fw-bold"
+                    th:classappend="${mov.tipo == 'ENTRADA'} ? ' text-success' : ' text-danger'"
+                    th:text="${(mov.tipo == 'ENTRADA' ? '+' : '-') + mov.cantidad}">0</td>
+                <td class="text-center" style="color:var(--text-muted-color);" th:text="${mov.stockAnterior}">0</td>
+                <td class="text-center fw-semibold" th:text="${mov.stockResultante}">0</td>
+                <td style="font-size:0.82rem;color:var(--text-muted-color);"
+                    th:text="${mov.documentoRef != null and !mov.documentoRef.isEmpty()} ? ${mov.documentoRef} : '—'">—</td>
+                <td class="pe-4" style="font-size:0.82rem;color:var(--text-muted-color);"
+                    th:text="${mov.usuarioNombre}">—</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(listaMovimientos)}">
+                <td colspan="8" class="text-center py-5" style="color:var(--text-muted-color);">
+                  <i class="fa-solid fa-list-check fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                  No hay movimientos con los filtros aplicados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script th:src="@{/js/btn_sidebar.js}"></script>
+</body>
+</html>
