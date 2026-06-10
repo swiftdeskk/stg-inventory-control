@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Requisitos Funcionales - STG Inventory</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 40px; }
+        .header { text-align: center; border-bottom: 3px solid #4caf50; padding-bottom: 30px; margin-bottom: 40px; }
+        .header h1 { color: #4caf50; font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: #666; margin: 5px 0; }
+        .status-bar { background: #e8f5e9; border-radius: 5px; padding: 20px; margin-bottom: 30px; text-align: center; }
+        .status-bar .percentage { font-size: 3em; color: #4caf50; font-weight: bold; }
+        .status-bar .text { color: #2e7d32; font-weight: bold; margin-top: 10px; }
+        .rf-item { background: white; border: 2px solid #4caf50; border-radius: 5px; padding: 20px; margin-bottom: 15px; display: flex; align-items: flex-start; }
+        .rf-badge { background: #4caf50; color: white; padding: 10px 15px; border-radius: 5px; font-weight: bold; min-width: 70px; text-align: center; margin-right: 20px; }
+        .rf-content { flex: 1; }
+        .rf-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .rf-description { color: #666; margin-bottom: 8px; }
+        .rf-status { color: #4caf50; font-weight: bold; font-size: 0.95em; }
+        .check { color: #4caf50; font-weight: bold; margin-right: 5px; }
+        .details { background: #f9f9f9; border-left: 3px solid #4caf50; padding: 12px; margin-top: 10px; font-size: 0.9em; color: #555; }
+        .summary { background: #e8f5e9; border: 2px solid #4caf50; padding: 20px; border-radius: 5px; margin-top: 40px; }
+        .summary h2 { color: #2e7d32; margin-bottom: 15px; }
+        .summary-item { margin: 10px 0; display: flex; align-items: center; }
+        .summary-item .icon { width: 30px; height: 30px; background: #4caf50; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold; }
+        footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 0.85em; }
+        @media print { body { background: white; } .container { box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ VERIFICACIÓN DE REQUISITOS FUNCIONALES</h1>
+            <p><strong>STG Inventory Control System</strong></p>
+            <p>Reporte de Cumplimiento y Estado de Implementación</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="percentage">100%</div>
+            <div class="text">TODOS LOS REQUISITOS FUNCIONALES COMPLETADOS</div>
+        </div>
+
+        <!-- RF-01 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-01</div>
+            <div class="rf-content">
+                <div class="rf-title">Login y Validación de Credenciales</div>
+                <div class="rf-description">El sistema valida las credenciales comparando usuario y contraseña con la base de datos.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> UserDetailsServiceImpl.java (línea 20) • SecurityConfig.java • LoginSuccessListener.java<br>
+                    <strong>Funcionalidad:</strong> Búsqueda de usuario en BD, validación con Spring Security, manejo de roles
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-02 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-02</div>
+            <div class="rf-content">
+                <div class="rf-title">Bloqueo por Intentos Fallidos</div>
+                <div class="rf-description">El sistema bloquea la cuenta tras 3 intentos fallidos consecutivos de acceso.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> LoginFailureListener.java (línea 28) • LoginSuccessListener.java<br>
+                    <strong>Funcionalidad:</strong> Conteo de intentos fallidos, bloqueo automático en intento 3, reseteo en login exitoso
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-03 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-03</div>
+            <div class="rf-content">
+                <div class="rf-title">Gestión de Usuarios</div>
+                <div class="rf-description">Registrar nuevos usuarios asignando un rol de permisos específico (Admin, Almacenero, Vendedor).</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> UsuarioController.java (línea 36) • SecurityConfig.java<br>
+                    <strong>Funcionalidad:</strong> Validación de username/correo único, cifrado BCrypt, asignación de roles, control de acceso
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-04 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-04</div>
+            <div class="rf-content">
+                <div class="rf-title">Gestión de Categorías</div>
+                <div class="rf-description">Registrar categoría validando que el nombre no exista previamente.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> CategoriaController.java (línea 43, 48)<br>
+                    <strong>Funcionalidad:</strong> Validación case-insensitive, código automático (CAT-01, CAT-02...), activación por defecto
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-05 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-05</div>
+            <div class="rf-content">
+                <div class="rf-title">Creación de Productos</div>
+                <div class="rf-description">Registrar producto validando que el código SKU sea único.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> ProductoController.java (línea 103, 108, 115)<br>
+                    <strong>Funcionalidad:</strong> Validación SKU único, stock inicial 0, stock mínimo configurable, marca opcional
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-06 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-06</div>
+            <div class="rf-content">
+                <div class="rf-title">Edición de Productos</div>
+                <div class="rf-description">Actualizar información del producto manteniendo el código SKU inalterable.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> ProductoController.java (línea 122, 131, 139)<br>
+                    <strong>Funcionalidad:</strong> SKU bloqueado, edición de nombre/precio/categoría, historial de precios, auditoría
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-07 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-07</div>
+            <div class="rf-content">
+                <div class="rf-title">Baja Lógica de Productos</div>
+                <div class="rf-description">Cambiar estado del producto a "Inactivo" sin borrar el registro.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> ProductoController.java (línea 57, 64)<br>
+                    <strong>Funcionalidad:</strong> Toggle activo/inactivo, protección de historial, exclusión de operaciones nuevas
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-08 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-08</div>
+            <div class="rf-content">
+                <div class="rf-title">Filtros y Búsqueda Avanzada</div>
+                <div class="rf-description">Listar productos filtrando por categoría, código SKU, marca o estado.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> ProductoController.java (línea 67, 80)<br>
+                    <strong>Funcionalidad:</strong> Búsqueda multi-filtro, paginación (12 productos/página), filtros combinables
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-09 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-09</div>
+            <div class="rf-content">
+                <div class="rf-title">Registrar Entrada de Mercadería</div>
+                <div class="rf-description">Registrar entrada sumando la cantidad al stock actual del producto.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> KardexController.java (línea 30, 55)<br>
+                    <strong>Funcionalidad:</strong> Incremento automático de stock, registro de documento, trazabilidad (usuario, fecha, hora)
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-10 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-10</div>
+            <div class="rf-content">
+                <div class="rf-title">Registrar Salida de Mercadería</div>
+                <div class="rf-description">Registrar salida restando la cantidad del stock actual del producto.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> KardexController.java (línea 70, 93)<br>
+                    <strong>Funcionalidad:</strong> Decremento automático de stock, validación de stock suficiente, prevención de negativos
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-11 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-11</div>
+            <div class="rf-content">
+                <div class="rf-title">Validación de Salida</div>
+                <div class="rf-description">Validar que la cantidad solicitada no supere el stock disponible.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> KardexController.java (línea 87)<br>
+                    <strong>Funcionalidad:</strong> Validación antes de guardar, prevención de stock negativo, mensaje de error claro
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-12 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-12</div>
+            <div class="rf-content">
+                <div class="rf-title">Kardex - Registro Inalterable</div>
+                <div class="rf-description">Generar registro inalterable en Kardex en cada entrada o salida.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> KardexController.java (línea 52, 89) • Movimiento.java<br>
+                    <strong>Funcionalidad:</strong> Registro automático, campos updatable=false, auditoría (usuario, fecha, stock anterior/resultante)
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-13 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-13</div>
+            <div class="rf-content">
+                <div class="rf-title">Historial Kardex</div>
+                <div class="rf-description">Consultar historial del Kardex filtrando por rango de fechas o tipo de movimiento.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> KardexController.java (línea 111, 125)<br>
+                    <strong>Funcionalidad:</strong> Filtro por tipo (ENTRADA/SALIDA), rango de fechas, listado cronológico, auditoría completa
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-14 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-14</div>
+            <div class="rf-content">
+                <div class="rf-title">Dashboard - KPI de Inventario</div>
+                <div class="rf-description">Calcular el total de productos contabilizando solo aquellos en estado "Activo".</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> WebController.java (línea 44, 50)<br>
+                    <strong>Funcionalidad:</strong> Contadores automáticos, cálculo de valor total, gráficos por categoría/mes, KPIs ejecutivos
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-15 -->
+        <div class="rf-item">
+            <div class="rf-badge">RF-15</div>
+            <div class="rf-content">
+                <div class="rf-title">Alertas de Stock Bajo</div>
+                <div class="rf-description">Emitir alerta visual cuando producto llega a su nivel mínimo.</div>
+                <div class="rf-status"><span class="check">✓</span>100% COMPLETADO</div>
+                <div class="details">
+                    <strong>Implementación:</strong> WebController.java (línea 58) • ProductoRepository.java<br>
+                    <strong>Funcionalidad:</strong> Detección automática (stock <= stockMinimo), listado resaltado en dashboard, contador de alertas
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="summary">
+            <h2>📊 RESUMEN EJECUTIVO DE CUMPLIMIENTO</h2>
+
+            <div class="summary-item">
+                <div class="icon">15</div>
+                <div><strong>Requisitos Funcionales Implementados:</strong> Todos los RF-01 a RF-15</div>
+            </div>
+
+            <div class="summary-item">
+                <div class="icon">✓</div>
+                <div><strong>Porcentaje de Cumplimiento:</strong> 100% - Todos completados y verificados</div>
+            </div>
+
+            <div class="summary-item">
+                <div class="icon">✓</div>
+                <div><strong>Módulos Funcionales:</strong> Seguridad, Catálogo, Operaciones, Reportes</div>
+            </div>
+
+            <div class="summary-item">
+                <div class="icon">✓</div>
+                <div><strong>Control de Calidad:</strong> Comentarios en código, documentación HTML, auditoría integrada</div>
+            </div>
+
+            <div class="summary-item">
+                <div class="icon">✓</div>
+                <div><strong>Stack Tecnológico:</strong> Spring Boot 3.x, PostgreSQL, Thymeleaf, Bootstrap 5</div>
+            </div>
+
+            <div class="summary-item">
+                <div class="icon">✓</div>
+                <div><strong>Trazabilidad:</strong> Cada RF identificado en código con comentarios específicos</div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>STG Inventory Control System</strong> - Reporte de Verificación de Requisitos</p>
+            <p>Verificación realizada: Junio 2026 | Estado: APROBADO 100%</p>
+            <p>Documento generado automáticamente desde verificación de código</p>
+        </footer>
+    </div>
+</body>
+</html>
